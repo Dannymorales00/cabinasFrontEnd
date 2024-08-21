@@ -1,15 +1,20 @@
 import RoomDetailsModal from './ModalDetailsRoom';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import ReactPaginate from 'react-paginate'; // Importa ReactPaginate
+import AuthContext from './../context/AuthContext';
+import axios from './../Axios/configAxios';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
-const TblRooms = ({ rooms }) => {
+const TblRooms = ({ rooms, getRooms }) => {
     const [FilterEstado, setFilterEstado] = useState('Todos');
     const [FilterNumero, setFilterNumero] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
-    const roomPerPage = 4; // Número de usuarios por página+
-
-
+    const roomPerPage = 4;
+    const { token } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const filteredUsers = () => {
         if (rooms) {
@@ -19,16 +24,16 @@ const TblRooms = ({ rooms }) => {
             }
 
             if (FilterEstado !== 'Todos' && FilterNumero !== '') {
-                return rooms.filter((user) => (user.estado === FilterEstado) && (user.numero.toString().indexOf(FilterNumero) !== -1));
+                return rooms.filter((room) => (room.estado === FilterEstado) && (room.numero.toString().indexOf(FilterNumero) !== -1));
             }
 
             if (FilterEstado !== 'Todos') {
-                return rooms.filter((user) => (user.estado === FilterEstado));
+                return rooms.filter((room) => (room.estado === FilterEstado));
             }
 
             if (FilterNumero !== '') {
-                return rooms.filter((user) => {
-                    return user.numero.toString().indexOf(FilterNumero) !== -1;
+                return rooms.filter((room) => {
+                    return room.numero.toString().indexOf(FilterNumero) !== -1;
                 });
             }
         }
@@ -43,21 +48,50 @@ const TblRooms = ({ rooms }) => {
     const offset = currentPage * roomPerPage;
     const currentRooms = filteredUsers().slice(offset, offset + roomPerPage);
 
+    const deleteRoom = (id) => {
+        console.log(id);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        axios.delete(`rooms/delete/${id}`, config).then((response) => {
+            if (response.status === 200) {
+                toast.error("se eliminó correctamente");
+                getRooms()
+            }
+        }).catch((error) => {
+            if (error.response.status === 401) {
+                navigate("/login");
+            }
+            if (error.response.status === 400) {
+                toast.error(error.response.data.msg[0].msg);
+            }
+            if (error.response.status === 404) {
+                toast.error(error.response.data.msg);
+            }
+            // console.log(error)
+        });
+    }
 
     return (
         <>
             <div >
-                <p className='mt-5 fs-5' data-aos="fade-out" data-aos-delay={150}>Administración de habitaciones</p>
-                <div className="row mb-3 py-2 " data-aos="fade-out" data-aos-delay={150}>
-                    <div style={{ width: 170 }}>
+  
+                <p className='mt-3 mt-sm-5 fs-5' data-aos="fade-out" data-aos-delay={150}>Administración de habitaciones</p>
+                <div className="row mb-0 mb-sm-3 py-2 py-sm-2 " data-aos="fade-out" data-aos-delay={150}>
+
+                    <div className='col col-6 col-sm-4 col-lg-2' >
                         <label htmlFor="filterSelect" className="form-label mb-0">Filtrar por estado:</label>
-                        <select id="filterSelect" className="form-select" defaultValue={FilterEstado} onChange={(e) => setFilterEstado(e.target.value)} style={{ width: '140px', height: 35 }}>
+                        <select id="filterSelect" className="form-select"
+                            defaultValue={FilterEstado} onChange={(e) => setFilterEstado(e.target.value)}
+                            style={{ width: '140px', height: 35 }}>
                             <option value="Todos">Todos</option>
                             <option value="Activo">Activos</option>
                             <option value="Inactivo">Inactivos</option>
                         </select>
                     </div>
-                    <div style={{ width: 170 }}>
+                    <div className='col col-6 col-sm-4  col-lg-2' >
                         <label htmlFor="filterId" className="form-label mb-0">Filtrar por numero:</label>
                         <input
                             className="form-control"
@@ -71,15 +105,13 @@ const TblRooms = ({ rooms }) => {
                             }}
                         />
                     </div>
-                    <div style={{ width: 170 }}>
-
-                        <a className='btn btn-success' href={'/newRoom'}
-
+                    <div className='col col-12 col-sm-4 col-lg-8 text-end p-2 pe-3'>
+                        <a className='btn btn-success mt-2' href={'/newRoom'}
                             id='btn'
                             style={{ width: '140px' }}
-
                         >Agregar</a>
                     </div>
+
                 </div>
                 <div className="table-responsive">
                     <div style={{ height: 300 }} >
@@ -110,7 +142,7 @@ const TblRooms = ({ rooms }) => {
                                             <a className="btn btn-primary btn-sm" href={`/editRoom/${room.id}`}><span className="fa fa-edit fa-fade" /></a>
                                         </td>
                                         <td data-aos="fade-out" data-aos-delay={150}>
-                                            <button className="btn btn-danger btn-sm"><span className="fa fa-trash fa-fade" /></button>
+                                            <button className="btn btn-danger btn-sm" id={room.id} onClick={() => deleteRoom(room.id)}><span className="fa fa-trash" /></button>
                                         </td>
                                     </tr>
                                 ))}
@@ -120,30 +152,29 @@ const TblRooms = ({ rooms }) => {
                 </div>
 
                 {rooms &&
-
-                    <div data-aos="fade-out" data-aos-delay={150}>
+                    <div className='my-1 table-responsive' data-aos="fade-out" data-aos-delay={150}>
                         <ReactPaginate
-                            previousLabel={"Anterior"}
-                            nextLabel={"Siguiente"}
-                            breakLabel={"..."}
-                            pageCount={Math.ceil(rooms.length / roomPerPage)}
-                            marginPagesDisplayed={2}
-                            pageRangeDisplayed={3}
+                            nextLabel=">"
                             onPageChange={handlePageChange}
-                            pageClassName={"page-item"}
-                            pageLinkClassName={"page-link"}
-                            previousClassName={"page-item"}
-                            previousLinkClassName={"page-link"}
-                            nextClassName={"page-item"}
-                            nextLinkClassName={"page-link"}
-                            breakClassName={"page-item"}
-                            breakLinkClassName={"page-link"}
-                            containerClassName={"pagination"}
-                            activeClassName={"active"}
+                            pageRangeDisplayed={1}
+                            marginPagesDisplayed={1}
+                            pageCount={Math.ceil(rooms.length / roomPerPage)}
+                            previousLabel="<"
+                            pageClassName="page-item"
+                            pageLinkClassName="page-link"
+                            previousClassName="page-item"
+                            previousLinkClassName="page-link"
+                            nextClassName="page-item"
+                            nextLinkClassName="page-link"
+                            breakLabel="..."
+                            breakClassName="page-item"
+                            breakLinkClassName="page-link"
+                            containerClassName="pagination"
+                            activeClassName="active"
                             renderOnZeroPageCount={null}
-
                         />
                     </div>
+
 
                 }
             </div>

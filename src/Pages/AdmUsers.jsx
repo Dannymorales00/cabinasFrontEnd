@@ -17,7 +17,7 @@ const AdmUsers = () => {
     const getUsers = useCallback(() => {
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
+                Authorization: `Bearer ${token}`, 
             },
         };
 
@@ -29,47 +29,26 @@ const AdmUsers = () => {
             }
         }).catch((error) => {
             if (error.response.status === 401) {
-                navigate("/login");
+                return navigate("/login");
             }
-            if (error.response.status === 403) {
-                navigate("/");
+            if (error.response.status === 404) {
+               return navigate("/");
             }
             console.log(error)
             //toast.error("Ocurrió un error inesperado "+ error.response.data.error);
-            toast.error("problema de conexión detectado");
+            return toast.error("problema de conexión detectado");
         });
 
     }, [navigate, token])
 
     useEffect(() => {
-        getUsers()
-    }, [auth.id, getUsers, navigate, token]);
+        if (!Users) {
+            getUsers()
+        }
 
-    const deleteUser = (id) => {
-        console.log(id);
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
-            },
-        };
-        axios.delete(`users/delete/${id}`, config).then((response) => {
-            // console.log(response);
-            if (response.status === 200) {
-                console.log(response);
-                toast.error("se cancelo");
-            }
-        }).catch((error) => {
-            if (error.response.status === 401) {
-                navigate("/login");
-            }
-            if (error.response.status === 403) {
-                navigate("/");
-            }
-            console.log(error)
-            //toast.error("Ocurrió un error inesperado "+ error.response.data.error);
-            toast.error("problema de conexión detectado");
-        });
-    }
+    }, [Users, auth.id, getUsers, navigate, token]);
+
+
 
     return (
         <>
@@ -78,7 +57,7 @@ const AdmUsers = () => {
             </header>
             <div className="container">
                 <ToastContainer theme="light" position="bottom-right" />
-                {Users ? <TblUsers users={Users} deleteUser={deleteUser} getUsers={getUsers} /> : null}
+                {Users ? <TblUsers users={Users} getUsers={getUsers} /> : null}
             </div>
         </>
     )

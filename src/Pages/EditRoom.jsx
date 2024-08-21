@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 // import convert from "image-file-resize";
 import { FileUploader } from "react-drag-drop-files";
 import axios from '../Axios/configAxios'
@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthContext from '../context/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
+import NavDashBoard from './../components/NavDashBoard';
 
 const EditRoom = () => {
     const { id } = useParams();
@@ -25,7 +26,7 @@ const EditRoom = () => {
     });
     const navigate = useNavigate();
 
-    const handleUploadLocalImages = async (imagenes) => {
+    const handleUploadLocalImages = useCallback(async (imagenes) => {
         try {
             const listUrl = await Promise.all(imagenes.map(async (imagen) => {
                 const respuesta = await fetch(imagen.url);
@@ -36,11 +37,10 @@ const EditRoom = () => {
             }));
             setImageBlobCloudinary(listUrl);
             setImageUrlCloudinary(imagenes);
-
         } catch (error) {
             console.error('Error al descargar las imágenes:', error);
         }
-    };
+    }, [])
 
     useEffect(() => {
 
@@ -62,11 +62,6 @@ const EditRoom = () => {
                             porcentajeDescuento: res.data.porcentajeDescuento,
                         })
                         handleUploadLocalImages(res.data.imagenes);
-                        // handleUploadLocalImages(res.data.imagenes)
-
-                        // setRoom(res.data);
-                        // console.log(res);
-
                     }
                 })
                 .catch(error => {
@@ -127,7 +122,6 @@ const EditRoom = () => {
         setImageLocal(ImageLocal.concat(ListFiles));
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (ImageLocal.length === 0 && ImageBlobCloudinary.length === 0) {
@@ -145,7 +139,6 @@ const EditRoom = () => {
         } catch (error) {
             console.error('Error al convertir el archivo a base64:', error);
         }
-
         if (imgsBase64.length > 0 || ImageBlobCloudinary.length > 0) {
             crearHabitacion(imgsBase64);
         }
@@ -160,8 +153,6 @@ const EditRoom = () => {
         });
     };
 
-
-
     const eliminar = (e) => {
         //console.log(ImageBlobLocal.splice(e.target.id,1));
         const imgUrl = ImageBlobLocal.slice();
@@ -174,23 +165,15 @@ const EditRoom = () => {
 
 
     const eliminarCloud = (e) => {
-        //console.log(ImageBlobLocal.splice(e.target.id,1));
         const imgUrl = ImageBlobCloudinary.slice();
-        console.log(imgUrl);
-        console.log(e.target.id);
+        // console.log(ImageUrlCloudDelete.concat(ImageUrlCloudinary[e.target.id]));
         setImageUrlCloudDelete(ImageUrlCloudDelete.concat(ImageUrlCloudinary[e.target.id]));
         imgUrl.splice(e.target.id, 1);
         setImageBlobCloudinary(imgUrl);
-
-        // const file1 = ImageLocal.slice();
-        // file1.splice(e.target.id, 1);
-        // setImageLocal(file1);
     }
 
     const crearHabitacion = (imgsBase64) => {
-        console.log('paso...........');
         let imagenes = [];
-
         imagenes.push({ agregarImagenes: imgsBase64 });
         imagenes.push({ borrarImagenes: ImageUrlCloudDelete });
 
@@ -200,11 +183,11 @@ const EditRoom = () => {
                 Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
             }
         }
-        console.log(data);
+        // console.log(data);
         axios.put(`rooms/edit/${id}`, data, config)
             .then(res => {
                 if (res.status === 200) {
-                    toast.error('se actualizo correctamente');
+                    toast.success('se actualizo correctamente');
                     setTimeout(() => {
                         navigate("/admCabinas");;
                     }, 2000);
@@ -225,10 +208,12 @@ const EditRoom = () => {
     return (
         <>
             <ToastContainer theme="light" position="bottom-right" />
-            <div className="container">
+            <header className="site-header m-0 p-0">
+                <NavDashBoard />
+            </header>
+            <div className="container mt-5">
                 <div className="row justify-content-center">
                     <div className="col col-12 col-sm-10 col-lg-5 col-xl-5  align-self-center">
-                        <h2 className="mt-4">Editar Habitación</h2>
                         <form id='registerRoom' onSubmit={handleSubmit} className="" >
                             <div className=" text-white  rounded-3 my-5 bg-ligth border border-danger">
                                 <p className="fs-5  bg-danger text-center">Datos de la Habitación</p>
@@ -267,12 +252,6 @@ const EditRoom = () => {
                                                 onChange={handleChangeInt} defaultValue={DataForm.precio}
                                                 style={{ height: 40 }}
                                                 maxLength={7}
-                                                // onKeyDown={
-                                                //     (e) => {
-                                                //         if (e.target.value.length >= 150 && e.key !== 'Backspace') {
-                                                //             e.preventDefault();
-                                                //         }
-                                                //     }}
                                                 required
                                             />
                                         </div>
@@ -352,7 +331,7 @@ const EditRoom = () => {
                                 </div>
                             </div>
                             <div className="col-12 my-5 w-100 text-center">
-                                <button type="submit" className="btn btn-primary">Registrar</button>
+                                <button type="submit" className="btn btn-primary">Actualizar</button>
                             </div>
                         </form>
                     </div>

@@ -17,12 +17,11 @@ const AdmReservations = () => {
     const getReservations = useCallback(() => {
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
+                Authorization: `Bearer ${token}`,
             },
         };
 
         axios.get(`reservations/`, config).then((response) => {
-            //    console.log(response);
             if (response.status === 200) {
                 // console.log(response);
                 setReservations(response.data)
@@ -49,7 +48,7 @@ const AdmReservations = () => {
     const deleteUser = (id) => {
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
+                Authorization: `Bearer ${token}`,
             },
         };
         axios.delete(`reservations/delete/${id}`, config).then((response) => {
@@ -76,7 +75,7 @@ const AdmReservations = () => {
         const { value } = e.target
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
+                Authorization: `Bearer ${token}`, 
             },
         };
         const body = { estadoReserva: value }
@@ -104,7 +103,7 @@ const AdmReservations = () => {
         const { value } = e.target
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
+                Authorization: `Bearer ${token}`, 
             },
         };
         const body = { estadoPago: value }

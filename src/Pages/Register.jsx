@@ -4,7 +4,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import axios from './../Axios/configAxios';
 
-
 const RegistroForm = () => {
     const [formData, setFormData] = useState({
         cedula: '',
@@ -14,7 +13,6 @@ const RegistroForm = () => {
         contrasena: '',
     });
     const navigate = useNavigate();
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -93,7 +91,6 @@ const RegistroForm = () => {
                                 <span className="fa fa-arrow-left" />
                             </button>
                         </div>
-
 
                         <form onSubmit={handleSubmit} className="card text-dark border border-danger">
                             <div className="card" >

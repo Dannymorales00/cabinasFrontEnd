@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext"
 import { PayPalScriptProvider } from "@paypal/react-paypal-js"
 import AOS from 'aos';
-import 'aos/dist/aos.css'; // You can also use <link> for styles
+import 'aos/dist/aos.css'; 
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

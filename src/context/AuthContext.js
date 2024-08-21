@@ -37,14 +37,13 @@ const AuthProvider = ({ children }) => {
         const tokenLocalStorage = getTokenSession();
         if (tokenLocalStorage) {
             setToken(tokenLocalStorage.token)
-            getUserToken(tokenLocalStorage.token)
+                getUserToken(tokenLocalStorage.token)
         } else {
             setLoading(false);
         }
     }
 
     const getUserToken = (token) => {
-
         const config = {
             headers: {
                 Authorization: 'Bearer ' + token + ''
@@ -53,7 +52,7 @@ const AuthProvider = ({ children }) => {
         axios.get('users/getUserToken/', config)
             .then(res => {
                 // console.log(res.data)
-                setAuth(res.data.tokenData);
+                setAuth(res.data.tokenData)
             })
             .catch(function (error) {
                 console.log(error);

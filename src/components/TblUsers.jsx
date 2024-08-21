@@ -1,21 +1,22 @@
 import React, { useState, useContext } from 'react';
 import UserDetailsModal from './ModalDetailsUser';
 import UserEditModal from './ModalEditUser';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from './../Axios/configAxios';
 import Loading from './Loading';
 import AuthContext from './../context/AuthContext';
-import ReactPaginate from 'react-paginate'; // Importa ReactPaginate
+import { useNavigate } from 'react-router-dom';
+import ReactPaginate from 'react-paginate';
 
-const TblUsers = ({ users, deleteUser, getUsers }) => {
+const TblUsers = ({ users, getUsers }) => {
     const { token } = useContext(AuthContext);
     const [IsLoading, setIsLoading] = useState(false);
     const [FilterEstado, setFilterEstado] = useState('Todos');
     const [FilterCedula, setFilterCedula] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
 
-
+    const navigate = useNavigate();
     const usersPerPage = 4; // Número de usuarios por página+
 
 
@@ -83,16 +84,40 @@ const TblUsers = ({ users, deleteUser, getUsers }) => {
     const offset = currentPage * usersPerPage;
     const currentUsers = filteredUsers().slice(offset, offset + usersPerPage);
 
+    const deleteUser = (id) => {
+        console.log(id);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        axios.delete(`users/delete/${id}`, config).then((response) => {
+            if (response.status === 200) {
+                toast.error("se eliminó correctamente");
+                getUsers()
+            }
+        }).catch((error) => {
+            if (error.response.status === 401) {
+                navigate("/login");
+            }
+            if (error.response.status === 400) {
+                toast.error(error.response.data.msg[0].msg);
+            }
+            if (error.response.status === 404) {
+                toast.error(error.response.data.msg);
+            }
+            // console.log(error)
+        });
+    }
 
     return (
         <>
-            <ToastContainer theme="light" position="bottom-right" />
             {IsLoading ? (
                 <Loading loading={IsLoading} />
             ) : (
 
-                <div style={{marginTop:'150px'}}>
-                    <p className='mt-5 fs-5' data-aos="fade-out" data-aos-delay={150}>Administración de usuarios</p>
+                <div style={{ marginTop: '110px' }}>
+                    <p className='mt-2 mt-sm-5 fs-5' data-aos="fade-out" data-aos-delay={150}>Administración de usuarios</p>
 
                     <div className="row mb-3 py-2 " data-aos="fade-out" data-aos-delay={150}>
                         <div style={{ width: 170 }}>
@@ -149,7 +174,8 @@ const TblUsers = ({ users, deleteUser, getUsers }) => {
                                                         type="checkbox"
                                                         id={`flexSwitchCheck${user.id}`}
                                                         checked={user.estado === "Activo"}
-                                                        onChange={(e) => handleSwitchChange(e, user.id)} // Llama a la función de manejo de cambio de estado
+                                                        onChange={(e) => handleSwitchChange(e, user.id)}
+                                                        disabled={user.tipo === 'Administrador'}
                                                     />
                                                     <label className="form-check-label" htmlFor={`flexSwitchCheck${user.id}`}>
                                                         {user.estado === "Activo" ? 'Activo' : 'Inactivo'}
@@ -164,42 +190,41 @@ const TblUsers = ({ users, deleteUser, getUsers }) => {
                                                 {user ? <UserEditModal user={user} handleRefresh={handleRefresh} /> : null}
                                             </td>
                                             <td data-aos="fade-in" data-aos-delay={150}>
-                                                <button id={user.id} onClick={(e) => deleteUser(e.target.id)} className="btn btn-danger btn-sm"><span className="fa fa-ban fa-fade" /></button>
+                                                <button id={user.id} onClick={() => deleteUser(user.id)} className="btn btn-danger btn-sm"><span className="fa fa-trash fa-fade" /></button>
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
-
-                        {users &&
-
-                            <div data-aos="fade-out" data-aos-delay={150}>
-                                <ReactPaginate
-                                    previousLabel={"Anterior"}
-                                    nextLabel={"Siguiente"}
-                                    breakLabel={"..."}
-                                    pageCount={Math.ceil(users.length / usersPerPage)}
-                                    marginPagesDisplayed={2}
-                                    pageRangeDisplayed={3}
-                                    onPageChange={handlePageChange}
-                                    pageClassName={"page-item"}
-                                    pageLinkClassName={"page-link"}
-                                    previousClassName={"page-item"}
-                                    previousLinkClassName={"page-link"}
-                                    nextClassName={"page-item"}
-                                    nextLinkClassName={"page-link"}
-                                    breakClassName={"page-item"}
-                                    breakLinkClassName={"page-link"}
-                                    containerClassName={"pagination"}
-                                    activeClassName={"active"}
-                                    renderOnZeroPageCount={null}
-
-                                />
-                            </div>
-
-                        }
                     </div>
+                    {users &&
+
+                        <div className='my-1' data-aos="fade-out" data-aos-delay={150}>
+                            <ReactPaginate
+                                nextLabel=">"
+                                onPageChange={handlePageChange}
+                                pageRangeDisplayed={1}
+                                marginPagesDisplayed={1}
+                                pageCount={Math.ceil(users.length / usersPerPage)}
+                                previousLabel="<"
+                                pageClassName="page-item"
+                                pageLinkClassName="page-link"
+                                previousClassName="page-item"
+                                previousLinkClassName="page-link"
+                                nextClassName="page-item"
+                                nextLinkClassName="page-link"
+                                breakLabel="..."
+                                breakClassName="page-item"
+                                breakLinkClassName="page-link"
+                                containerClassName="pagination"
+                                activeClassName="active"
+                                renderOnZeroPageCount={null}
+
+                            />
+                        </div>
+
+                    }
                 </div>)}
         </>
     )

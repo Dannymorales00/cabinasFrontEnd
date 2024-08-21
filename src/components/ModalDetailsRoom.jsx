@@ -1,7 +1,16 @@
+import FormatDate from './FormatDate';
+import { useState } from 'react';
 const RoomDetailsModal = ({ room }) => {
+    const [imagenCargada, setImagenCargada] = useState(false);
+
+    const manejarErrorImagen = (e) => {
+        if (!imagenCargada) {
+            e.target.src = '/img/room_genenic.jpg'; // Cargar imagen por defecto en caso de error
+            setImagenCargada(true);
+        }
+    };
     return (
         <>
-
             <button data-aos="fade-out" data-aos-delay={150} type="button" className="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target={"#exampleModal" + room.id}>
                 <span className="fa fa-eye fa-fade" />
             </button>
@@ -19,41 +28,50 @@ const RoomDetailsModal = ({ room }) => {
                             ></button>
                         </div>
                         <div className="modal-body">
-                     
-                                <div id={"carouselExampleFade" + room.id} className="carousel slide carousel-fade" data-bs-interval="3000" data-bs-ride="carousel">
-                                    <div className="carousel-inner text-center" >
 
-                                        {room.imagenes&&
-                                            room.imagenes.map((img, index) => index === 0 ? <div key={index} className="carousel-item active">
-                                                <img src={img.url} className="d-block w-100 img-fluid" alt="..." style={{ maxHeight: 300, minHeight: 200 }} />
+                            <div id={"carouselExampleFade" + room.id} className="carousel slide carousel-fade" data-bs-interval="3000" data-bs-ride="carousel">
+                                <div className="carousel-inner text-center" >
+
+                                    {room.imagenes &&
+                                        room.imagenes.map((img, index) => index === 0 ?
+                                            <div key={index} className="carousel-item active">
+                                                {console.log(img)}
+                                                <img src={img ? img.url : 'img/room_genenic.jpg'}
+                                                    className="d-block w-100 img-fluid"
+                                                    alt="..."
+                                                    style={{ maxHeight: 300, minHeight: 200 }}
+                                                    onError={manejarErrorImagen}
+                                                />
                                             </div> :
-                                                <div key={index} className="carousel-item">
-                                                    <img src={img.url} className="d-block w-100 img-fluid" alt="..." style={{ maxHeight: 300, minHeight: 200 }} />
-                                                </div>
-                                            )
-                                        }
+                                            <div key={index} className="carousel-item">
+                                                <img src={img ? img.url : 'img/room_genenic.jpg'}
+                                                    className="d-block w-100 img-fluid"
+                                                    alt="..."
+                                                    style={{ maxHeight: 300, minHeight: 200 }}
+                                                    onError={manejarErrorImagen}
+                                                />
+                                            </div>
+                                        )
+                                    }
 
-                                    </div>
-                                    <button className="carousel-control-prev" type="button" data-bs-target={"#carouselExampleFade" + room.id} data-bs-slide="prev">
-                                        <span className="carousel-control-prev-icon" aria-hidden="true" />
-                                        <span className="visually-hidden">Previous</span>
-                                    </button>
-                                    <button className="carousel-control-next" type="button" data-bs-target={"#carouselExampleFade" + room.id} data-bs-slide="next">
-                                        <span className="carousel-control-next-icon" aria-hidden="true" />
-                                        <span className="visually-hidden">Next</span>
-                                    </button>
                                 </div>
-                      
-
-
+                                <button className="carousel-control-prev" type="button" data-bs-target={"#carouselExampleFade" + room.id} data-bs-slide="prev">
+                                    <span className="carousel-control-prev-icon" aria-hidden="true" />
+                                    <span className="visually-hidden">Previous</span>
+                                </button>
+                                <button className="carousel-control-next" type="button" data-bs-target={"#carouselExampleFade" + room.id} data-bs-slide="next">
+                                    <span className="carousel-control-next-icon" aria-hidden="true" />
+                                    <span className="visually-hidden">Next</span>
+                                </button>
+                            </div>
 
                             {room && (
                                 <div>
                                     <p>ID: {room.id}</p>
                                     <p>Número: {room.numero}</p>
                                     <p>Descripción: {room.descripcion}</p>
-                                    <p>Creada: {room.createdAt}</p>
-                                    <p>Actualizada:{room.updatedAt}</p>
+                                    <p>Creada: {FormatDate(room.createdAt)}</p>
+                                    <p>Actualizada: {FormatDate(room.updatedAt)}</p>
                                 </div>
                             )}
                         </div>
@@ -69,9 +87,6 @@ const RoomDetailsModal = ({ room }) => {
                     </div>
                 </div>
             </div >
-
-
-
         </>
     );
 };

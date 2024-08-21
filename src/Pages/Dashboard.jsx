@@ -42,7 +42,7 @@ const Dashboard = () => {
                 Authorization: `Bearer ${token}`,
             },
         };
-        axios.get(`rooms/`, config).then((response) => {
+        axios.get(`rooms/adm`, config).then((response) => {
             if (response.status === 200) {
                 console.log(response);
                 setRooms(response.data)

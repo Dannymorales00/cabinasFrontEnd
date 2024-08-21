@@ -45,11 +45,7 @@ const Nav = () => {
                                 </li>
                                 : null}
 
-                            {/* {auth ?
-                                <li className="nav-item px-3">
-                                    <a className="nav-link" href="/myCart" tabIndex={-1} aria-disabled="true"> <span className="fa fa-shopping-cart fa-fade" /></a>
-                                </li>
-                                : null} */}
+    
 
                             {auth ?
                                 <li className="dropdown nav-item px-2">

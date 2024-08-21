@@ -21,11 +21,10 @@ const ProfilePage = () => {
     const getUser = useCallback(() => {
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
+                Authorization: `Bearer ${token}`, 
             },
         };
         axios.get(`users/${auth.id}`, config).then((response) => {
-            // console.log(response);
             if (response.status === 200) {
                 setUserLogged(response.data)
             }
@@ -62,7 +61,6 @@ const ProfilePage = () => {
 
                         toast.info(res.data.msg);
                         setShowNewPass(true)
-
                     }
                 })
                 .catch(error => {
@@ -82,13 +80,11 @@ const ProfilePage = () => {
         } else {
             toast.info('debe ingresar un correo electronico')
         }
-
     }
 
     const hideMenuPass = () => {
         setShowNewPass(false)
     }
-
 
     return (
         <div>

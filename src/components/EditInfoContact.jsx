@@ -4,55 +4,59 @@ const EditInfoContact = ({ infoContact, handleInputChangeInfoContact}) => {
     <div className="container">
       <div>
         <div className="mb-3">
-          <label className="form-label">Correo:</label>
+          <label className="form-label text-dark">Correo:</label>
           <input
-            type="text"
+            type="email"
             name="correo"
             value={infoContact.correo}
             onChange={(e)=>handleInputChangeInfoContact(e)}
             className="form-control"
+            maxLength={50}
             required
 
           />
         </div>
         <div className="mb-3">
-          <label className="form-label">Dirección:</label>
+          <label className="form-label text-dark">Dirección:</label>
           <input
             type="text"
             name="direccion"
             value={infoContact.direccion}
             onChange={(e)=>handleInputChangeInfoContact(e)}
             className="form-control"
+            maxLength={120}
             required
 
           />
         </div>
         <div className="mb-3">
-          <label className="form-label">Teléfono 1:</label>
+          <label className="form-label text-dark">Teléfono 1:</label>
           <input
             type="text"
             name="telefono1"
             value={infoContact.telefono1}
             onChange={(e)=>handleInputChangeInfoContact(e)}
             className="form-control"
+            maxLength={10}
             required
 
           />
         </div>
         <div className="mb-3">
-          <label className="form-label">Teléfono 2:</label>
+          <label className="form-label text-dark">Teléfono 2 (opcional):</label>
           <input
             type="text"
             name="telefono2"
             value={infoContact.telefono2}
             onChange={(e)=>handleInputChangeInfoContact(e)}
             className="form-control"
-            required
+            maxLength={10}
+ 
 
           />
         </div>
         <div className="mb-3">
-          <label className="form-label">URL WhatsApp:</label>
+          <label className="form-label text-dark">URL WhatsApp:</label>
           <input
             type="text"
             name="urlWhatsApp"

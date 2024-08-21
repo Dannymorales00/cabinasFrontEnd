@@ -8,20 +8,13 @@ import Nav from '../components/Nav';
 function Home() {
 
     const [infoHome, setInfoHome] = useState(null);
-
     useEffect(() => {
-
         axios.get('home').then((response) => {
-            // console.log(response);
             if (response.status === 200) {
-                //console.log(response.data);
-                //toast.success("Se cargo infoHome!");
                 setInfoHome(response.data)
             }
-
         }).catch((error) => {
             console.log(error.response)
-            //toast.error("Ocurrió un error inesperado "+ error.response.data.error);
             toast.error("problema de conexión detectado");
         });
 
@@ -32,22 +25,19 @@ function Home() {
             <ToastContainer theme="light" position="bottom-right" />
             <header className="site-header m-0 p-0">
                 <Nav />
-
             </header>
-            {infoHome ?
-                <section className="site-hero overlay" style={{ backgroundImage: `url(${infoHome.imagesHome[0].url})` }}>                <div className="container">
+            <section className="site-hero overlay" style={{ backgroundImage: `url(${infoHome ? infoHome.imagesHome[0].url : null})` }}>                <div className="container">
 
-                    <div className="row site-hero-inner justify-content-center align-items-center">
-                        <div className="col-md-10 text-center">
+                <div className="row site-hero-inner justify-content-center align-items-center">
+                    <div className="col-md-10 text-center">
 
-                            <h1 className="heading" data-aos="fade-up" data-aos-delay={100}>Bienvenido a <em>Cabinas Guanacaste</em></h1>
-                            <p className="sub-heading mb-5" data-aos="fade-up" data-aos-delay={100}>Descubre nuestras cabinas.</p>
-                            <p data-aos="fade-up" data-aos-delay={150}> <a href="#contactanos" className="btn uppercase btn-outline-light d-sm-inline d-block">Contactanos</a></p>
-                        </div>
+                        <h1 className="heading" data-aos="fade-up" data-aos-delay={100}>Bienvenido a <em>Cabinas Guanacaste</em></h1>
+                        <p className="sub-heading mb-5" data-aos="fade-up" data-aos-delay={100}>Descubre nuestras cabinas.</p>
+                        <p data-aos="fade-up" data-aos-delay={150}> <a href="#contactanos" className="btn uppercase btn-outline-light d-sm-inline d-block" style={{ padding: '12px' }}>Contactanos</a></p>
                     </div>
                 </div>
-                </section> : null}
-            {/* END section */}
+            </div>
+            </section>
             <section className="section testimonial-section" data-aos="fade-up" data-aos-delay={100} style={{ height: '80vh', marginTop: '10%' }}>
                 <div className="container">
                     <div className="row justify-content-center text-center mb-5">
@@ -65,8 +55,6 @@ function Home() {
                                 </blockquote>
                             </div>
                         </div>
-
-                        {/* END col */}
                     </div>
                 </div>
             </section>
@@ -109,34 +97,54 @@ function Home() {
             <section className="section bg-pattern" id='contactanos'>
                 <div className="container">
                     <div className="row justify-content-center text-center">
-                        <div className="col-12 col-md-6  rounded" data-aos="fade-up" style={{ background: 'rgba(0,0,0,0.8)' }}>
-                            <p className=" fs-3 text-white img-fluid mt-4" >Ubicación</p>
+                        <div className="col-12 col-md-6  rounded footer-section" data-aos="fade">
+                            <p className=" fs-3 text-white  mt-4" >Ubicación</p>
                             <iframe title='maps' src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d3924.1372840203535!2d-85.08736725114726!3d10.410669518738672!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1scabinas%20guanacaste!5e0!3m2!1ses-419!2scr!4v1700135907377!5m2!1ses-419!2scr" width={400} height={300} style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
                         </div>
-                        <div className="col-12 col-md-6 rounded" data-aos="fade-up" style={{ background: 'rgba(0,0,0,0.8)' }}>
+                        <div className="col-12 col-md-6 rounded footer-section" data-aos="fade">
                             <div style={{ maxHeight: 500 }}>
                                 <p className="fs-3 text-white mt-4" >Contactanos</p>
-                                <form action="https://formsubmit.co/9be4145b12a13de767a9b9171259a790" method="post" className=" p-4 " >
+                                <form action="https://formsubmit.co/9be4145b12a13de767a9b9171259a790" method="post" className=" px-4 mb-5 " >
                                     <div className="row">
                                         <div className="col-md-6 form-group">
                                             <label htmlFor="nombre">Nombre</label>
-                                            <input type="text" id="nombre" name='nombre' autoComplete='nombre' className="form-control " style={{ height: 35 }} />
+                                            <input type="text" id="nombre"
+                                                name='nombre' autoComplete='nombre'
+                                                className="form-control " style={{ height: 35 }}
+                                                maxLength={30}
+                                                required
+                                            />
                                         </div>
                                         <div className="col-md-6 form-group">
                                             <label htmlFor="telefono">Telefono</label>
-                                            <input type="text" id="telefono" name='telefono' autoComplete='telefono' className="form-control " style={{ height: 35 }} />
+                                            <input type="text" id="telefono" 
+                                            name='telefono' autoComplete='telefono' 
+                                            className="form-control " style={{ height: 35 }} 
+                                            maxLength={10}
+                                            required
+                                            />
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="col-md-12 form-group">
                                             <label htmlFor="correo">Correo</label>
-                                            <input type="email" id="correo" name='correo' autoComplete='correo' className="form-control " style={{ height: 35 }} />
+                                            <input type="email" id="correo" 
+                                            name='correo' autoComplete='correo' 
+                                            className="form-control " style={{ height: 35 }}
+                                            maxLength={45}
+                                            required 
+                                            />
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="col-md-12 form-group">
                                             <label htmlFor="mensaje">Escribe un mensaje</label>
-                                            <textarea name="mensaje" id="mensaje" autoComplete='mensaje' className="form-control " cols={30} rows={5} defaultValue={""} />
+                                            <textarea name="mensaje" id="mensaje" 
+                                            autoComplete='mensaje' className="form-control " 
+                                            cols={30} rows={5} defaultValue={""} 
+                                            maxLength={300}
+                                            required
+                                            />
                                         </div>
                                     </div>
                                     <div className="row text-center my-3">
@@ -149,7 +157,6 @@ function Home() {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
             <Footer infoHome={infoHome} />

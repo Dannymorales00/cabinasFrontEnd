@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import axios from './../Axios/configAxios';
 import AuthContext from './../context/AuthContext';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const UserEditModal = ({ value, styles, user, handleRefresh }) => {
@@ -37,12 +37,10 @@ const UserEditModal = ({ value, styles, user, handleRefresh }) => {
                 }
                 //  console.log(error);
             })
-
     };
 
     return (
         <>
-            <ToastContainer theme="light" position="bottom-right" />
             <button data-aos="fade-out" data-aos-delay={150} type="button" className={styles ? styles : 'btn btn-primary btn-sm'} style={styles ? { minWidth: 200 } : null} data-bs-toggle="modal" data-bs-target={"#editModal" + user.id}>
                 <span className="fa fa-pencil fa-fade" /> {value ? value : null}
             </button>
@@ -85,6 +83,8 @@ const UserEditModal = ({ value, styles, user, handleRefresh }) => {
                                                 onChange={handleInputChange}
                                                 className="form-control"
                                                 style={{ height: 40, width: 150 }}
+                                                maxLength={10}
+                                                required
                                             />
                                         </div>
 
@@ -99,17 +99,21 @@ const UserEditModal = ({ value, styles, user, handleRefresh }) => {
                                                 onChange={handleInputChange}
                                                 className="form-control"
                                                 style={{ height: 40 }}
+                                                maxLength={50}
+                                                required
                                             />
                                         </div>
                                         <div className="mb-3">
                                             <label className="form-label mb-0">Correo</label>
                                             <input
-                                                type="text"
+                                                type="email"
                                                 name="correo"
                                                 value={editedUser.correo}
                                                 onChange={handleInputChange}
                                                 className="form-control"
                                                 style={{ height: 40 }}
+                                                maxLength={50}
+                                                required
                                             />
                                         </div>
                                 

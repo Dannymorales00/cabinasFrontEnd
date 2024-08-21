@@ -4,7 +4,8 @@ import { FileUploader } from "react-drag-drop-files";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthContext from '../context/AuthContext';
-import axios from '../Axios/configAxios'
+import axios from '../Axios/configAxios';
+import NavDashBoard from './../components/NavDashBoard';
 
 const NewRoom = () => {
     const { token } = useContext(AuthContext);
@@ -108,14 +109,14 @@ const NewRoom = () => {
         const data = { ...FrmData, imagenes: imgsBase64 }
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
+                Authorization: `Bearer ${token}`,
             }
         }
         console.log(data);
         axios.post('rooms/', data, config)
             .then(res => {
                 if (res.status === 200) {          
-                    toast.error('se registro correctamente');
+                    toast.success('se registro correctamente');
                     setTimeout(() => {
                         window.location.reload(); 
                     }, 2000);
@@ -135,7 +136,11 @@ const NewRoom = () => {
     }
     return (
         <>
-            <ToastContainer theme="light" position="bottom-right" />
+         <ToastContainer theme="light" position="bottom-right" />
+            <header className="site-header m-0 p-0">
+                <NavDashBoard />
+
+            </header>
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col col-12 col-sm-10 col-lg-5 col-xl-5  align-self-center">
@@ -228,7 +233,7 @@ const NewRoom = () => {
                                 <p className="fs-6 py-2 bg-danger text-center">Arrastra las imagenes para agregarlas</p>
                                 <div className=" rounded-2 mb-5 p-2" >
                                     <div className="row row-cols-lg-4 row-cols-2" style={{ minHeight: 150 }}>
-                                        {/* {console.log(ImageUrl)} */}
+                           
                                         {File.length > 0 &&
 
                                             ImageUrl.map((url, index) =>

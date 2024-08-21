@@ -35,33 +35,33 @@ const DashboardCharts = ({ reservations, rooms }) => {
     title: 'Cantidad de Reservaciones entre meses',
     titleTextStyle: {
       color: '#000',
-      fontSize: 15, // Cambia este valor a 'white' o cualquier color hexadecimal blanco que prefieras
+      fontSize: 15, 
     },
     curveType: 'function',
     legend: {
       position: 'bottom',
       textStyle: {
-        color: '#000' // Cambia este valor a 'white' o cualquier color hexadecimal blanco que prefieras
+        color: '#000' 
       }
     },
     colors: ['red'],
     vAxis: {
       gridlines: { color: 'transparent' },
       textStyle: {
-        color: '#000' // Cambia este valor a 'white' o cualquier color hexadecimal blanco que prefieras
+        color: '#000' 
       }
     },
     hAxis: {
       gridlines: { color: 'transparent' },
       textStyle: {
-        color: '#000' // Cambia este valor a 'white' o cualquier color hexadecimal blanco que prefieras
+        color: '#000'
       }
     },
     backgroundColor: {
-      fill: '#FDFEFE' // Cambia este valor al color de fondo que desees
+      fill: '#FDFEFE' 
     },
     chartArea: {
-      borderRadius: 30 // Ajusta este valor según el radio de redondeo deseado
+      borderRadius: 30 
     }
   };
 

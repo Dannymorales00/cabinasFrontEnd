@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import PayPalButton from '../components/PayPalButton';
 import AuthContext from './../context/AuthContext';
@@ -6,6 +6,7 @@ import axios from './../Axios/configAxios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Nav from './../components/Nav';
+
 
 function RoomDetails() {
     const { id } = useParams();
@@ -17,11 +18,28 @@ function RoomDetails() {
     const [TipoCambio, setTipoCambio] = useState(0);
     const [Total, setTotal] = useState(0);
     const [imagenCargada, setImagenCargada] = useState(false);
+    const [DateVerify, setDateVerify] = useState(false);
 
-    const totalPrecio = () => {
+
+    // Funciones para calcular subtotal y total
+    const timeDifference = useCallback(() => {
+        return Math.round((checkOutDate - checkInDate) / (1000 * 60 * 60));
+    }, [checkInDate, checkOutDate]);
+
+    const subTotalCostoxHora = useCallback(() => {
+        return timeDifference() * parseInt(Room.precio);
+    }, [Room, timeDifference]);
+
+    const subTotalDescuento = useCallback(() => {
+        return subTotalCostoxHora() === 0 || Room.porcentajeDescuento === "0"
+            ? 0
+            : (parseInt(Room.precio) * parseInt(Room.porcentajeDescuento)) / 100;
+    }, [Room, subTotalCostoxHora]);
+
+    const totalPrecio = useCallback(() => {
         const subTotal = subTotalCostoxHora() - subTotalDescuento();
         return subTotal;
-    };
+    }, [subTotalCostoxHora, subTotalDescuento])
 
     useEffect(() => {
 
@@ -55,7 +73,7 @@ function RoomDetails() {
             fetch('https://tipodecambio.paginasweb.cr/api/')
                 .then(response => response.json())
                 .then(data => {
-                    if (data.venta) {
+                    if (data.venta && data.venta > 0) {
                         setTipoCambio((data.venta))
 
                     } else {
@@ -76,24 +94,6 @@ function RoomDetails() {
 
         }
     }, [Room, TipoCambio, id, token, totalPrecio]);
-
-
-    // Funciones para calcular subtotal y total
-    const timeDifference = () => {
-        return Math.round((checkOutDate - checkInDate) / (1000 * 60 * 60));
-    };
-
-    const subTotalCostoxHora = () => {
-        return timeDifference() * parseInt(Room.precio);
-    };
-
-    const subTotalDescuento = () => {
-        return subTotalCostoxHora() === 0 || Room.porcentajeDescuento === "0"
-            ? 0
-            : (parseInt(Room.precio) * parseInt(Room.porcentajeDescuento)) / 100;
-    };
-
-
 
     // Función para manejar el pago
     const handlePayment = (order) => {
@@ -127,6 +127,7 @@ function RoomDetails() {
                     if (res.status === 200) {
 
                         setIsPaymentComplete(true);
+                        setDateVerify(false);
                         console.log(res);
                     }
                 })
@@ -158,7 +159,7 @@ function RoomDetails() {
 
 
         const año = fechaOriginal.getFullYear();
-        const mes = (fechaOriginal.getMonth() + 1).toString().padStart(2, '0'); // Sumamos 1 al mes, ya que los meses en JavaScript van de 0 a 11
+        const mes = (fechaOriginal.getMonth() + 1).toString().padStart(2, '0'); // Sumamos 1 al mes, ya que los meses van de 0 a 11
         const día = fechaOriginal.getDate().toString().padStart(2, '0');
         const horas = fechaOriginal.getHours().toString().padStart(2, '0');
         const minutos = fechaOriginal.getMinutes().toString().padStart(2, '0');
@@ -174,6 +175,66 @@ function RoomDetails() {
         }
     };
 
+    const handleCheckIn = (e) => {
+        setCheckOutDate(new Date(e.target.value))
+        setCheckInDate(new Date(e.target.value))
+        setDateVerify(false);
+        setIsPaymentComplete(false);
+        document.getElementById('checkOutDate').min = formatDate(new Date(e.target.value));
+    }
+    const handleCheckOut = (e) => {
+        if (checkInDate > (new Date(e.target.value))) {
+            return toast.error('la fecha de salida debe ser porterior a la de entrada');
+        }
+        setCheckOutDate(new Date(e.target.value))
+        setDateVerify(false);
+        setIsPaymentComplete(false);
+    }
+
+    const handleVerify = (e) => {
+        const { id } = e.target
+
+        if (Total <= 0) {
+            return toast.info('debes selecionar las fechas de reserva');
+        }
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        };
+
+        const data = {
+            fechaReservaDesde: checkInDate,
+            fechaReservaHasta: checkOutDate
+        }
+
+        axios.post(`reservations/available/${id}`, data, config)
+            .then(res => {
+                if (res.status === 200) {
+                    // console.log(res);
+                    toast.success(res.data.msg);
+                    setDateVerify(true);
+
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                if (error.response.status === 400) {
+                    toast.error(error.response.data.msg);
+                }
+                if (error.response.status === 404 || error.response.status === 401) {
+                    toast.error(error.response.data.msg);
+                }
+            });
+
+
+    }
+
+    const showPayButton = () => {
+        return ((Total > 0) && (TipoCambio > 0) && DateVerify)
+    }
+
 
 
     return (
@@ -186,28 +247,29 @@ function RoomDetails() {
                 <ToastContainer theme="light" position="bottom-right" />
                 {Room ? (
                     <div className="row " style={{ marginTop: '17vh' }}>
-                        <div className="col border rounded " style={{background: 'linear-gradient(to right, rgba(255,255,255,0.9), rgba(200,200,200,0.6))'}}>
+                        <div className="col " >
                             <div className="col-12 col-sm-12">
-                                <div className="row p-2 p-sm-4">
+                                <div className="row p-2 p-sm-4 shadow border-start border-dark border-3 rounded" style={{ minHeight: 550, background: 'linear-gradient(45deg, rgba(255,251,251,0.5646134918811274) 0%, rgba(193,184,184,0.46377315574667366) 100%)' }}>
 
-                                    <div className="col-sm-6  p-3">
-                                        <div id={"carouselExampleFade" + Room.id} className="carousel slide carousel-fade" data-bs-interval="3000" data-bs-ride="carousel">
+                                    <div className="col-sm-6  p-3" style={{ minHeight: 270 }}>
+                                        <div id={"carouselExampleFade" + Room.id} className="carousel slide carousel-fade p-2" data-bs-interval="3000" data-bs-ride="carousel">
                                             <div className="carousel-inner text-center" >
 
                                                 {Room.imagenes &&
-                                                    Room.imagenes.map((img, index) => index === 0 ? <div key={index} className="carousel-item active">
-                                                        <img    src={img ? img.url : '/img/room_genenic.jpg'} 
-                                                        className=" card-img-top shadow-sm w-100 img-fluid" 
-                                                        alt="..." 
-                                                        onError={manejarErrorImagen}
-                                                        style={{ maxHeight: 300, minHeight: 200, maxWidth: 500 }} />
-                                                    </div> :
+                                                    Room.imagenes.map((img, index) => index === 0 ?
+                                                        <div key={index} className="carousel-item active">
+                                                            <img src={img ? img.url : '/img/room_genenic.jpg'}
+                                                                className=" card-img-top shadow  img-fluid rounded"
+                                                                alt="..."
+                                                                onError={manejarErrorImagen}
+                                                                style={{ maxHeight: 222, minHeight: 200, maxWidth: 350 }} />
+                                                        </div> :
                                                         <div key={index} className="carousel-item">
-                                                            <img  src={img ? img.url : '/img/room_genenic.jpg'} 
-                                                            className="card-img-top shadow-sm w-100 img-fluid" 
-                                                            alt="..." 
-                                                            onError={manejarErrorImagen}
-                                                            style={{ maxHeight: 300, minHeight: 200, maxWidth: 500 }} />
+                                                            <img src={img ? img.url : '/img/room_genenic.jpg'}
+                                                                className="card-img-top shadow img-fluid rounded"
+                                                                alt="..."
+                                                                onError={manejarErrorImagen}
+                                                                style={{ maxHeight: 222, minHeight: 200, maxWidth: 350 }} />
                                                         </div>
                                                     )
                                                 }
@@ -225,7 +287,7 @@ function RoomDetails() {
                                     </div>
 
                                     <div className="col-sm-6  p-0">
-                                        <div className="mx-3 mx-sm-2 mx-lg-4 mt-4">
+                                        <div className="mx-4 mx-sm-2 mx-lg-4 mt-2 mt-sm-4">
                                             <div className="mb-3 mt-5">
                                                 <label className='fs-6 fw-bold'>Fecha de Entrada:</label>
                                                 <input
@@ -233,7 +295,7 @@ function RoomDetails() {
                                                     className="form-control"
                                                     type="datetime-local"
                                                     value={formatDate(checkInDate)}
-                                                    onChange={(e) => setCheckInDate(new Date(e.target.value))}
+                                                    onChange={handleCheckIn}
                                                     min={formatDate(new Date())}
                                                     max={maxDate()}
                                                 />
@@ -245,7 +307,7 @@ function RoomDetails() {
                                                     id="checkOutDate"
                                                     name="checkOutDate"
                                                     value={formatDate(checkOutDate)}
-                                                    onChange={(e) => setCheckOutDate(new Date(e.target.value))}
+                                                    onChange={handleCheckOut}
                                                     min={formatDate(new Date())}
                                                     max={maxDate()}
                                                 />
@@ -254,21 +316,41 @@ function RoomDetails() {
                                         </div>
                                     </div>
 
-                                    <div className="col-lg-12 my-2" >
-                                        <div className=" bg-light rounded">
-                                            <p className='my-1 mx-2 fs-5 fw-bold'>Detalles de Habitación:</p>
-                                            <p className='my-0 mx-2 py-0 fs-6 fw-bold'>Numero Habitación: <span className='fs-5 fw-normal'>{Room.numero}</span></p>
-                                            <p className='my-0 mx-2 py-0 fs-6 fw-bold'>Capacidad: <span className='fs-5 fw-normal'>{Room.capacidad}</span></p>
-                                            <p className='my-0 mx-2 py-0 fs-6 fw-bold'>Precio: <span className='fs-5 fw-normal'></span>{Room.precio} CRC</p>
-                                            <p className='my-0 mx-2 py-0 fs-6 fw-bold'>Descuento: <span className='fs-5 fw-normal'></span>{Room.porcentajeDescuento}%</p>
+                                    <div className="col-lg-12 my-0" >
+                                        <div className=" row rounded border border-white rounded bg-white mx-sm-3">
+                                            <div className="col-12 col-sm-12 col-lg-6">
+                                                <p className='my-1 mx-2 fs-6 fw-bold '>Detalles de la Habitación</p>
+                                                <p className='my-0 mx-2 py-0 fs-6'>Numero Habitación: <span className='fs-5 fw-bold'>{Room.numero}</span></p>
+                                                <p className='my-0 mx-2 py-0 fs-6 '>Capacidad: <span className='fs-5 fw-bold'>{Room.capacidad}</span></p>
+                                                {Room.porcentajeDescuento > 0 ?
+                                                    <p className='my-0 mx-2 py-0 fs-6 '>Descuento: <span className='fs-5 fw-bold'>{Room.porcentajeDescuento}%</span></p>
+                                                    :
+                                                    <p className='my-0 mx-2 py-0 fs-6 '><span className='fs-5 fw-bold'></span></p>
+                                                }
+                                                <p className='my-0 mx-2 py-0 fs-6 '>Precio: <span className='fs-5 fw-bold'> {Room.precio}</span> CRC por hora</p>
+
+                                            </div>
+                                            <div className="col-12 col-sm-12 col-lg-6 text-center text-sm-center text-md-end text-lg-center p-2 mt-lg-5">
+                                                <p className='mx-lg-5 mx-2 my-0 me-md-4 fs-5 '>Disponibilidad <span className={`fa ${DateVerify ? 'fa-check-square-o' : 'fa-square-o'}`} /> </p>
+                                                <button className='btn btn-warning text-dark' type='button'
+                                                    name='verify' id={id}
+                                                    onClick={handleVerify}
+                                                    style={{ height: 40 }}
+                                                >
+                                                    verificar disponibilidad
+                                                </button>
+                                            </div>
+
+
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="col-lg-4 border ">
+                        <div className="col-lg-4 border-start shadow border-dark border-2 rounded">
                             <div className=" mx-xl-5 mt-2 mt-sm-4 p-3 mx-sm-3 mx-0">
-                                <p className='mb-0 fs-4'>Detalles de Costos</p>
+                                <p className='mb-0 fs-5'>Detalles de Costos</p>
                                 <table className="table table-sm table-hover" style={{ maxWidth: 300 }}>
                                     <tbody>
                                         <tr>
@@ -293,18 +375,16 @@ function RoomDetails() {
                                         </tr>
                                     </tbody>
                                 </table>
-                                <div className=" mt-4 mb-5" style={{ maxWidth: 300 }}>
-                                    <p className='fs-4 mt-5'>Método de pago</p>
+                                <div className=" mt-4 mb-4" style={{ maxWidth: 300 }}>
+                                    <p className='fs-5 mt-5'>Método de pago</p>
                                     {isPaymentComplete ? (
                                         <div className='w-100'>
                                             <p className='mb-0 fs-5'>Pago completado. <span className="fa fa-check-circle-o fa-fade fa-lg" /></p>
-                                            <p className='mb-0 fs-5'> Gracias por tu compra.</p>
-                                            {toast.success('Pago completado, revisa tus reservaciones')}
+                                            <p className='mb-0 fs-5'>Revisa tus reservaciones.</p>
+
                                         </div>
                                     ) : (
-
-                                        (Total > 0) && (TipoCambio > 0) ? (
-
+                                        showPayButton() ? (
                                             <PayPalButton handlePayment={handlePayment} totalvalue={(Total / TipoCambio).toFixed(2)} invoice={`pago habitación #${Room.numero}`} />
                                         ) : null
                                     )}
@@ -313,7 +393,7 @@ function RoomDetails() {
                         </div>
                     </div>
                 ) : null}
-            </div>
+            </div >
 
         </>
     );

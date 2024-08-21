@@ -7,7 +7,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthContext from '../context/AuthContext';
 
-
 const Login = () => {
     const { auth, handleAuth } = useContext(AuthContext);
     const [Loading, setLoading] = useState(false);
@@ -19,8 +18,6 @@ const Login = () => {
     )
     const { cedula, password } = values;
     const navigate = useNavigate();
-
-        
 
     useEffect(() => {
         // Verifica el estado auth al cargar el componente
@@ -66,7 +63,6 @@ const Login = () => {
 
     const handleRegister = () => { navigate("/register"); }
     const handleResetPassword = () => { navigate("/forgotPassword"); }
-
     return (
         <>
             <ToastContainer theme="light" position="bottom-right" />
@@ -81,15 +77,12 @@ const Login = () => {
                         </div>
                         <form onSubmit={(e) => { ComprobarUsuario(e) }} className="card text-dark border border-danger">
                             <div className="card" >
-                                <div className="card-header h5 text-white bg-danger text-center">CABINAS GUANACASTE</div>
+                                <div className="card-header h5 text-white bg-danger text-center pt-3" style={{minHeight:45}}>CABINAS GUANACASTE</div>
                                 <div className="card-body px-3 px-sm-5">
                                     <div onKeyDown={(e) => e.key === 'Enter' && ComprobarUsuario(e)}>
                                         <div className="text-center my-4">
                                             <div className="fs-5">Ingresar</div>
                                         </div>
-
-
-
                                         <div className="form-outline  mb-3 mt-5">
                                             <div className="input-group ">
                                                 <span className="input-group-text"><span className="fa fa-id-card fa-fade" /></span>
@@ -133,9 +126,6 @@ const Login = () => {
                                                 : <Spinner style={{ margin: "auto" }} visible={Loading} color="Red" />}
 
                                         </div>
-
-
-
                                     </div>
                                 </div>
                             </div>

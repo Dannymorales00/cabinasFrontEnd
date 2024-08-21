@@ -20,28 +20,23 @@ const EditRoom = () => {
     const [ImageLocal, setImageLocal] = useState([]);
     const [FormShedules, setFormShedules] = useState([]);
     const [FormInfoContact, setFormInfoContact] = useState(null);
-
     const handleInputChangeShedules = (e, id) => {
         const { name, value } = e.target;
         const updatedFormShedules = [...FormShedules];
         updatedFormShedules[id] = { ...updatedFormShedules[id], [name]: value };
         setFormShedules(updatedFormShedules);
     };
-
     const handleSwitchChange = (e, id) => {
         const { name, checked } = e.target;
         const updatedFormShedules = [...FormShedules];
         updatedFormShedules[id] = { ...updatedFormShedules[id], [name]: (checked ? 1 : 0) };
         setFormShedules(updatedFormShedules);
     };
-
     const handleInputChangeInfoContact = (e) => {
         const { name, value } = e.target;
         setFormInfoContact((prevInfo) => ({ ...prevInfo, [name]: value }));
     };
-
     const navigate = useNavigate();
-
     const handleUploadLocalImages = useCallback(async (imagenes) => {
         try {
             const listUrl = await Promise.all(imagenes.map(async (imagen) => {
@@ -59,7 +54,6 @@ const EditRoom = () => {
     }, []);
 
     useEffect(() => {
-
         if (FormShedules.length === 0 || FormInfoContact === null) {
             const config = {
                 headers: {
@@ -69,28 +63,12 @@ const EditRoom = () => {
             axios.get(`home/`, config)
                 .then(res => {
                     if (res.status === 200) {
-
-                        // setFormData({
-                        //     numero: res.data.numero,
-                        //     descripcion: res.data.descripcion,
-                        //     estado: res.data.estado,
-                        //     capacidad: res.data.capacidad,
-                        //     precio: res.data.precio,
-                        //     porcentajeDescuento: res.data.porcentajeDescuento,
-                        // })
-                        // handleUploadLocalImages(res.data.imagenes);
-                        // handleUploadLocalImages(res.data.imagenes)
-
-                        // setRoom(res.data);
-                        // console.log(res);
                         setFormInfoContact(res.data.infoContact);
                         setFormShedules(res.data.shedules);
                         handleUploadLocalImages(res.data.imagesHome);
-
                     }
                 })
                 .catch(error => {
-
                     if (error.response.status === 400) {
                         console.log(error.response.data.msg[0].msg);
                         toast.error(error.response.data.msg[0].msg);
@@ -102,16 +80,6 @@ const EditRoom = () => {
         }
 
     }, [FormInfoContact, FormShedules, handleUploadLocalImages, id, token]);
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setFormShedules({ ...FormShedules, [name]: value });
-    // };
-
-    // const handleChangeInt = (e) => {
-    //     e.target.value = e.target.value.replace(/[^\d]/ig, "")
-    //     handleChange(e)
-    // };
 
     const handleFileChange = (files) => {
         const imagenesPermitidas = ['.jpg', '.jpeg', '.png'];
@@ -165,7 +133,6 @@ const EditRoom = () => {
         } catch (error) {
             console.error('Error al convertir el archivo a base64:', error);
         }
-
         if (imgsBase64.length > 0 || ImageBlobCloudinary.length > 0) {
             editarHome(imgsBase64);
         }
@@ -179,8 +146,6 @@ const EditRoom = () => {
             reader.readAsDataURL(file);
         });
     };
-
-
 
     const eliminar = (e) => {
         //console.log(ImageBlobLocal.splice(e.target.id,1));
@@ -201,23 +166,13 @@ const EditRoom = () => {
         setImageUrlCloudDelete(ImageUrlCloudDelete.concat(ImageUrlCloudinary[e.target.id]));
         imgUrl.splice(e.target.id, 1);
         setImageBlobCloudinary(imgUrl);
-
-        // const file1 = ImageLocal.slice();
-        // file1.splice(e.target.id, 1);
-        // setImageLocal(file1);
     }
 
     const editarHome = (imgsBase64) => {
-
         const imagenes = {
             "agregarImagenes": imgsBase64,
             "borrarImagenes": ImageUrlCloudDelete
         }
-
-
-        // imagenes.push({ agregarImagenes: imgsBase64 });
-        // imagenes.push({ borrarImagenes: ImageUrlCloudDelete });
-
         const data = { shedules: FormShedules, infoContact: FormInfoContact, imagenes }
         const config = {
             headers: {
@@ -231,7 +186,7 @@ const EditRoom = () => {
                     console.log(res);
                     toast.info('se actualizo correctamente');
                     setTimeout(() => {
-                        navigate("/admCabinas");;
+                        navigate("/dashboard");;
                     }, 2000);
                 }
             })
@@ -262,8 +217,6 @@ const EditRoom = () => {
                                 <p className="fs-5  bg-danger text-center">Editar Información de Contacto</p>
                                 <div className="row my-3 p-3">
                                     {FormInfoContact ? <EditInfoContact infoContact={FormInfoContact} handleInputChangeInfoContact={handleInputChangeInfoContact} /> : null}
-
-
                                 </div>
                             </div>
 
@@ -271,16 +224,12 @@ const EditRoom = () => {
                                 <p className="fs-5  bg-danger text-center">Editar Horarios</p>
                                 <div className="row my-3 p-3">
                                     {FormShedules.length > 0 ? <TblShedules horarios={FormShedules} handleInputChangeShedules={handleInputChangeShedules} handleSwitchChange={handleSwitchChange} /> : null}
-
                                 </div>
                             </div>
-
                             <div className=" text-white  rounded-3 my-5 bg-ligth border border-danger">
                                 <p className="fs-5  bg-danger text-center mb-0">Editar banner</p>
                                 <div className=" rounded-2 mb-3 p-2  bg-dark" style={{ maxHeight: 510, minHeight: 300 }} >
-
                                     <div className="row" >
-
                                         {ImageBlobCloudinary.length > 0 ?
                                             ImageBlobCloudinary.map((url, index) =>
                                                 <div key={index} className="col">
@@ -293,7 +242,6 @@ const EditRoom = () => {
                                                     </div>
                                                 </div>
                                             ) : null}
-
                                         {ImageLocal.length > 0 &&
                                             ImageBlobLocal.map((url, index) =>
                                                 <div key={index} className="col">
@@ -302,7 +250,6 @@ const EditRoom = () => {
                                                         <div className="overlayImg bg-dark" id={index} onClick={eliminar}>
                                                             <span className="close-icon"><span className="fa fa-times fa-fade" /></span>
                                                         </div>
-
                                                     </div>
                                                 </div>
                                             )}
@@ -316,15 +263,12 @@ const EditRoom = () => {
                                 </div>
                             </div>
                             <div className="col-12 my-5 w-100 text-center">
-                                <button type="submit" className="btn btn-primary">Registrar</button>
+                                <button type="submit" className="btn btn-primary">Actualizar</button>
                             </div>
                         </form>
                     </div>
                 </div >
             </div >
-
-
-
         </>
     )
 }

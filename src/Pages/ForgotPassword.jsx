@@ -67,7 +67,6 @@ const ResetPassword = () => {
                 </button>
               </div>
               <form onSubmit={handleSubmit} name="signupForm" id="signupForm">
-
                 <div className="card" >
                   <div className="card-header h5 text-white bg-danger text-center">Restablecer contraseña</div>
                   <div className="card-body px-5">
@@ -78,7 +77,6 @@ const ResetPassword = () => {
                       Ingresa un correo electronico, donde se enviara las intrucciones para la recuperación de la contraseña.
                     </p>
                     <div className="form-outline">
-
                       <div className="input-group mb-3">
                         <span className="input-group-text"><span className="fa fa-envelope fa-fade" /></span>
                         <input onChange={(e) => handleInputChange(e.target.value)}
@@ -93,9 +91,7 @@ const ResetPassword = () => {
                         />
                       </div>
                       <label htmlFor="email" style={{ textAlign: 'left' }}>Ingrese el correo electrónico</label>
-
                     </div>
-
                     <div className="d-flex justify-content-end mt-3">
                       {!IsLoading ?
                         <button type="Submit" id="submitButton" className="btn btn-secondary"> Siguiente
@@ -103,20 +99,11 @@ const ResetPassword = () => {
                         : <Spinner style={{ margin: "auto" }} visible={IsLoading} color="Red" />
                       }
                     </div>
-
                   </div>
                 </div>
-
-
-
-
-
-
               </form>
-
             </div>
           </div>
-
         </div>
       }
 

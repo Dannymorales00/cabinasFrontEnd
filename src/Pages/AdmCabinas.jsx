@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState, useContext, useCallback } from 'react'
 import NavDashBoard from './../components/NavDashBoard';
 import axios from './../Axios/configAxios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -12,13 +12,15 @@ const AdmCabinas = () => {
   const [Rooms, setRooms] = useState(null);
   const { token } = useContext(AuthContext)
   const navigate = useNavigate();
-  useEffect(() => {
+
+
+  const getRooms = useCallback(() =>{
     const config = {
       headers: {
-        Authorization: `Bearer ${token}`, // Ejemplo: 'Bearer tu-token-jwt'
+        Authorization: `Bearer ${token}`,
       },
     };
-    axios.get('rooms', config).then((response) => {
+    axios.get('rooms/adm', config).then((response) => {
       // console.log(response);
       if (response.status === 200) {
         setRooms(response.data)
@@ -35,14 +37,23 @@ const AdmCabinas = () => {
       toast.error("problema de conexión detectado");
     });
 
-  }, [navigate, token]);
+
+  },[navigate, token]);
+
+  useEffect(() => {
+    if (!Rooms) {
+      getRooms();
+    }
+     
+
+  }, [Rooms, getRooms, navigate, token]);
 
   return (
     <>
       <NavDashBoard />
       <div className="container">
         <ToastContainer theme="light" position="bottom-right" />
-        {Rooms ? <TblRooms rooms={Rooms}  />:null}
+        {Rooms ? <TblRooms rooms={Rooms} getRooms={getRooms}  />:null}
       </div>
     </>
   )

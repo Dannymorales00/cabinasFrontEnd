@@ -1,4 +1,4 @@
-# Proyecto Cabinas Guanascaste
+# Proyecto Cabinas Guanacaste
 
 Este proyecto es el frontend de una aplicación web diseñada para facilitar la reservación de habitaciones en línea. 
 Los usuarios pueden navegar por la página para obtener información detallada sobre los servicios que ofrece el negocio, incluyendo los precios de las habitaciones y otros servicios adicionales.

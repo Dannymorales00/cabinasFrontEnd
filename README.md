@@ -88,9 +88,9 @@ A continuación, se muestran algunas imágenes de la aplicación:
 ### Páginas de gestión de cuentas
 [![register.png](https://i.postimg.cc/pXxMttd5/register.png)](https://postimg.cc/G9M5kVGb)
 [![login.png](https://i.postimg.cc/251Pxk0M/login.png)](https://postimg.cc/v1dqYsFt)
-[![profile.png](https://i.postimg.cc/ZqXX7GgR/profile.png)](https://postimg.cc/CZHvdQwT)
+[![profile.png](https://i.postimg.cc/3NSg7hfD/profilev2.png)](https://postimg.cc/gLhwqCWY)
 [![forgot-Password.png](https://i.postimg.cc/651cfdF6/forgot-Password.png)](https://postimg.cc/crwfs8sP)
-[![admUsers.png](https://i.postimg.cc/1X30ptHN/admUsers.png)](https://postimg.cc/JDSB8RS1)
+[![adm-Users.png](https://i.postimg.cc/13Lrf9mG/adm-Usersv2.png)](https://postimg.cc/fVf9PQ0y)
 
 ### Página de Administración de Habitaciones
 [![adm-Habitaciones.png](https://i.postimg.cc/4dBVNGg4/adm-Habitaciones.png)](https://postimg.cc/47HmBryj)
